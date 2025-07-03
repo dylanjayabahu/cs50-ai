@@ -1,0 +1,113 @@
+https://cs50.harvard.edu/ai/notes/4/
+
+Supervised Learning:
+we give data with both inputs/outputs, then machine learns a function to map inputs to outputs
+    
+
+
+
+CLASSIFICATION MODELS
+Classification = map inputs to discrete categories (supervised)
+
+Nearest Neighbour Classificaiton = given an input, classify it as the class of the nearest data point
+    e.g. if the closest data point in the dataset is class A, then this point will also be class A
+
+K nearest neighbour classificaiton (KNN)= look not just at 1 nearest neighbour, but at the k-nearest neighbours
+    - chooses the most common class of the k neighbours
+    - k is some value we chose (e.g. 3 or 5 or however many neihgbours we wanna look at)
+
+Perceptron Learning = create a decision boundary (only works for binary classification)
+    - basically linear regression as our decision boundary
+    - ans = w0 + w1x1 + w2x2 + w3x3 + ... (mulitply each input by a weight and add a final bias)
+        - Class 1 if ans >= 0, Class 0 otherwise
+
+    {w1, w, w3} are the weights, {x1, x2, x3} are the inputs, w0 is the bias term (weight 0)
+    we represent the weight vector as W = [w0, w1, w2, w3 ...]
+    we represent the input vector as  X = [1,  x1, x2, x3 ...]
+        -> so, ans = w0(1) + w1(x1) + w2(x2) + .... = W * X (dot product)
+            HHEHEHE WE TAKE THE DOT PRODUCT OF THE INPUT VECTOR AND WEIGHT VECTOR OH MY DAYS SO BEUTIFUL
+
+    So, more generally: h_w(x) = 1 if W*X >= 0; else 0
+        - where W is the weight vector and X is the input vector (with the first value being 1) and W*X is the dot product of W and X
+
+
+    Perceptron Learning Rule 
+        ->  w_i = w_i + alpha(y - h_w(X)) * x_i
+                - w_i is the ith element of the weight vector 
+                - X, y is the data point 
+                    -> X is the input vector, y is the output class
+                    -> x_i is the ith element of the input vector
+                - h_w(x) is the estimate value (W*X) [the hypothesis function]
+                - alpha is the learning rate
+                
+                - basically, adjust the old weight by:  alpha(actual-estimate) * x_i
+        -> we can start with random weights, then update the weights as we are given data points based on the above formula
+        -> we repeat this updating of the weights on all the data points (several times over) until the values converge
+    
+    Hard Threshold = class prediction switches from 0 to 1 after the estimate value (W*X) crosses a Threshold
+    Soft Threshold = 
+        able to express uncertainty; 
+        yeilds a real number in [0, 1]
+        closer to 1 = more certain of class 1, closer to 0 = more certain of class 0
+
+        this is done with a logistic function (whose range is [0, 1])
+        e.g. if W*X is right on the threshold, logistic function gives 0.5
+             if W*X is very far right of the threshold, logistic function gives 0.99
+             if W*X is very far left of the threshold, logistic function gives 0.01
+
+Support Vector Machine
+    - designed to find the Maximum Margin Separator 
+        - boundary that maximizes the dist to any data points
+    - does this w/ support vectors; vectors from the boundary to the nearest data points on either side
+    - this works in higher dimensions as well (u can have vectors in as many dims as u want)
+    - also works for datasets that aren't linearly separable
+
+
+
+
+REGRESSION MODELS
+Regression = map inputs to a continuous value (still supervised)
+- e.g. linear regression, but this time the line is not a boundary but the value we are predicting
+
+
+
+
+EVALUATING HYPOTHESES 
+
+Loss Function = function that measures how bad our hypothesis peforms
+- We want to minimize the loss function (optimization problem); more specifically, minimize the empirical loss 
+    - empirical loss = average loss for every data point
+- U could come up with any loss function, but several common ones exist:
+    - 0-1 loss function: Loss is 0 if predicted==actual, else 1
+    - L_1 loss: Loss = | actual - predicted |
+    - L_2 loss: LOss = (actual-predicted)^2      
+        - squares it to make positive instead of abs-value
+        - also penalizes worst predictions more hashly than close predictions
+
+Overfitting = model fits too closely with dataset and doesn't generalize
+
+Regularization: a method to comba overfitting by favoring simpler, more general hypotheses
+- Instead of just saying cost(h) = loss(h), we can say cost(h) = loss(h) + lambda*complexity(h)
+                                                                          { ^regularizing term }
+    - lambda is how much we want to weight complexity
+
+Holdout Cross Validation
+- splitting into train/test sets to evaluate for overfitting
+- drawback is that we never use the test data for training
+
+k-fold Cross Validation
+- split the data into k sets, then experiment k times, each time with a new set as the test set
+- this way all the data is used for training at some point
+
+
+Measures of Performance:
+
+Below are for binary classification tasks
+TP = true positives (predicted 1 and is 1)
+TN = true negatives (predicted 0 and is 0)
+FP = false positives (predicted 1 and is 0)
+FN = false negatives (predicted 0 and is 1)
+
+Accuracy = (TP+TN)/(TP+TN+FP+FN) # of all the actuals, how often do we classify correctly
+Sensitivity = True Positive rate = TP/(TP+FN) # of all the actual positives, how often do we classify them as positive
+Specificity = True Negative Rate = TN/(TN+FP) # of all the actual negatives, how often do we classify them as negative

@@ -1,0 +1,193 @@
+Natural Language Processing (NLP) = all tasks where the AI gets human language as input.
+    - automatic summarization
+    - information extraction
+    - machine translation (e.g. google translate)
+    - question answering
+    - text classification
+    etc 
+
+Syntax = structure of language
+Semantics = the meaning of language
+    - some sentences have same structure but diff meaning
+    - others have diff structure/diff altogether but same meaning 
+
+Formal Grammar = system of rules for generating sentences 
+    - rule based approach
+
+Context free grammar (CFG)= text is abstracted from meaning and represents just the structure 
+
+e.g. 
+
+She saw the city 
+
+N    V   D   N    <- assign non-terminal symbol to the terminal symbols in the sentence 
+                        Terminal symbol = word 
+                        Non-terminal symbol = structural symbol that can tern into a word   
+                            N(noun), V(Verb), D(determiner {the, a, an, ...})
+                            ADJ(adjective), P(preposition), NP(noun phrase)
+
+
+
+It knows how to do this with rewriting rules:
+    (a mapping of all the non-terminal symbols to things they can be)
+    e.g. N -> she | city | ball | ...
+
+    note that they can also turn be in terms of other non-terminal symobls:
+    NP -> N | D N 
+        a noun phrase (NP) can be just a noun, or a determiner and noun
+
+    VP -> V | V NP
+        a verb phrase (VP) can be just a verb, or a verb followed by a noun phrase, e.g {saw the city}
+
+    S -> NP VP 
+        a sentence is a noun phrase then a verb phrase (simble definition)
+
+
+
+
+nltk = python library (natural language tool kit)
+
+
+
+
+n-grams = a contiguous sequence of n terms from a sample of text 
+    the terms could be characters, words, etc.
+
+    unigram: n=1
+    bigram: n=2 
+    trigram: n=3
+
+    eg. How often have I said to you that when you have eliminated the impossible whatever remains, however improbable, must be the truth?
+
+    first trigram: "how often have" 
+    second trigram: "often have i"
+    third trigram: "have i said"
+
+
+    if u gave a lot of text data, the computer can pull out all the n-grams and see which ones are common 
+
+
+Tokenization = splitting a sequence of characters (e.g. long string of text) into pieces (tokens)
+    ^ like we did above, splitting into tokens which are the n-grams
+
+Markov Models
+U can make a Markov Chain w/ these tokens:
+    - You can predict the next states based on the previous states
+    => you can predict the next token based on the previous tokens
+    Sounds kind of like the text it was trained on, but lack any real meaning/purpose
+
+
+Bag-of-Words Model: represents text as an unordered set of words
+
+Naive Bayes Classifier: tool to classify text based on bayes rule. 
+    - Bayes Rule: P(b|a) = P(a|b)*P(b)/P(a)
+    e.g. for clasifying the sentiment (positive/negative) of a review
+
+    P(positive|words)  =  P(words|positive) * P(positive) / P(words)    <- Since P(words) [the denominator] is the same regardless of positive/negative, we can exclude it and express proprtionality
+    P(positive|words)  ~  P(words | positive) * P(positive)    <- get rid of denominator; we can normalize the distribution after
+    P(positive|words)  ~  P(positive) * P(words | positive)   <- assume that all the words are independant of each other (hence NAIVE bayes classifier)  
+    P(positive|words) (~) P(positive) * P(word1|positive) * P(word2|positive) * P(word3|positive) * ...    
+
+                            ^ now we can calculate based on experimental probabilites in a dataset:
+                            P(positive) = num positive/num reviews 
+                            P(wordn|positive) = num positive with wordn / num positive
+
+    If we do this for the positive case and the negative case, we can normalize the two and get our prob distribution
+
+
+    Note that if a word never appears in the trianing data, its P(word|positive) = 0, so we will predict the whole thing to be zero
+
+    We can combat this with smoothing:
+        - Additive smoothing = adding some value alpha to each value in our distribution to smooth the data 
+        - Laplace Smoothing = add 1 to each value in the distribution (assume we've seen each word 1 more than we actually have; handles the 0 case well)
+
+
+
+Word Representation = taking words and representing them as vectors
+
+    One-hot representation = representing meaning as a vector with one value as 1 and the others as 0 
+        e.g. [0, 0, 0, 1, 0, 0, 0, 0, 0, 0] could represent 3 if we were doing MNIST 
+
+        Or if we one-hot encoded words, we could do it like:
+
+        He   [1, 0, 0, 0]
+        Wrote [0, 1, 0, 0]
+        A     [0, 0, 1, 0]
+        Book [0, 0, 0, 1]
+
+        ^ doesn't work if we have lots and lots of possible words 
+
+    It would be ideal if words w/ similar meanings have similar vector representations
+
+    Distributed Representation = representatin of meaning distributed over multiple values (not just a single value like w/ one-hot)
+        e.g. 
+        [-0.34, -0.08, 0.02, -0.18, …] (he)
+        [-0.27, 0.40, 0.00, -0.65, …] (wrote)
+        [-0.12, -0.25, 0.29, -0.09, …] (a)
+        [-0.23, -0.16, -0.05, -0.57, …] (book)
+
+        We assign these vectors to words based on the context in which the words appear 
+        E.g. for __ he ate ...
+        breakfast, lunch, and dinner could all fit in that context; 
+        so breakfast lunch and dinner must have similar meaning;
+        so the vector representations of these words should be close to each other in vector space
+
+        Word2vec model = model for generating vector representations of words based on data 
+            - if u start out with random vector representations of words
+            - u can train and adjust the vectors so that similar words move closer together
+
+            - another property (other than related words being close together)
+                Relational Vector Arithmetic:
+                king - man = some vector, r 
+                man + r = king 
+
+                now, if we do woman + r ,we get queen!
+
+                we can capture the relationship between king and man, and when we apply it to woman, we get queen
+
+
+Now that we can represent words as vectors (of some length), 
+we can pass in some word to a neural network and get out another word
+
+if instead of a single word input/output, we want many words as input or output (a phrase or sequence), we can use a recurrent neural network 
+- we can use an encoder-decoder model:
+    each time we get a new input, we encode it in a hidden state. 
+    The old hidden state is passed in along with a new word to get the new hidden state. 
+    Once we have finisihed reading the input (by passing in an end token), we move to the decoder
+    We now generate a new word, and a new hidden state. 
+    The old hidden state is again passed in, along with the previously outputted word, and a new word is generated each time
+    We know we are done when the output is the end token once again.
+
+
+Attention = letting us decide which values we need to pay attention to when generating the next output
+    - we can calculate some attention score for each word of the input; 
+    - can calculate with a simple dot product, or train a hole neural net; either way we learn what we should be paying attention to
+    - each input word is asscoiated with a hidden state, so we can take a weighted average of all the hidden state vectors, weighted by the attention scores
+    - that final context vector can be fed into the decoder
+
+Note that the recurrent neural network structure forces things to be run in series; hard to paralellelize it b/c each run depends on the previous run 
+- large language model; requires lots of computational power to train and run
+
+
+
+Transformers 
+    - process (via neural net) each word independantly and output an encoded representation
+        - ez to parallelize - can do many words in parallel; dont have to wait 
+    - but we lose the info about word position; so we add a positional encoding to the input word
+    - we also add a self attention step before going into the feed forward nn 
+        - allow each word in the input to decide what other words in the input to pay attention to; allows for context interpretation
+        - often has many different self attention layers; multi-headed attention
+            with multi-headed attention we can pay attention to many diff parts of the input
+    - the self attention step and the neural network step can be repeated mamy times for a deeper learning method 
+    - all of this to get more useful encoded representations
+
+    - remember it does this for each input word on its own
+
+    ENCODER:
+    {Input word + Positional Encoding} -> Nx{{Self attention Layers} -> {NN}} -> {encoded representation}
+
+    DECODER:
+    {Previous output word + Positional Encoding} -> Nx{{self attention} -> {attention} -> {NN}} -> {next output word}
+        - note that self-attention is paying attention to other output words
+        - attention on the other hand is paying attention to the encoded representations from the encoder
+

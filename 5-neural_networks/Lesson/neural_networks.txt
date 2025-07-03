@@ -1,0 +1,104 @@
+https://cs50.harvard.edu/ai/notes/5/
+
+
+(Artificial) Neural Network
+- mathematical model for learning; maps inputs to outputs
+- inspired by biological neural networks 
+- neuron = unit = node
+
+Activation Functions:
+- Step function (1 if x >=0 else 0)
+- (Logistic) Sigmoid
+- ReLU (rectified linear unit; return max(x, 0))
+- ...
+
+To get value of neuron, f(sum(x_i * w_i) + w_0)
+    - x_i is the ith neuron of the previous layer
+    - w_i is the ith weight of the previous layer 
+    - w_0 is the bias term 
+    - f(x) is the activation function
+
+Gradient Descent = algo to minimize the loss when training neural network
+    - We can get the "slope" of the loss function (which is actually a vector called the gradient vector)
+        - gradient vector: ∇f = [∂f/∂x1, ∂f/∂x2, ..., ∂f/∂xn]
+            -> ∂f/∂xi is the partial derivative with respect to x_i
+                partial derivatives are just differentiating with respect to 1 variable
+            -> ∇f(x) tells u the direction of steepest ascent at point x (x is a vector of the parameters)
+    - from the gradient vector, we can find which way we should move to decrease the loss
+        - ∇f(x) points in dirction of steepest ascent, we want to go opposite that direction (-∇f(x))
+        - so, x_new = x_old - α * ∇f(x_old)   [similar in spirit to what we have seen before]
+            -> alpha is still learning rate
+            -> x_old is the original vector of parameters
+            -> x_new is the update vector of parameters
+
+    Algo: 
+        1. initialize to random parameters
+        2. repeat:
+            - calculate the gradient vector based on all the data points 
+            - update the parameters as described above 
+
+    Note that the "all data points" part is very computationally expensive
+    - Stochastic Gradient Descent: calculate the gradient vector based on just 1 data point; typically less accurate
+        - repeat until all data points are covered = 1 epoch
+    - Mini-Batch Gradient Descent 
+        - Instead, we can do it in batches - smaller chunks of data points 
+            - typically batch sizes are powers of 2 since they work well with computer hardware (e.g 32, 64, etc.)
+        - again, repeat until all data points are covered = 1 epoch
+
+
+Perceptrons can predict well for linearly separable data
+More complex relationships can be modelled with multi-layer neural networks (with hidden layer(s))
+
+Back Propagation: train a network w/ hidden layers
+Algo:
+    - start with random weights 
+    - repeat for n epochs:
+        forward pass {compute the predicted output (based on batch of data/single data etc.)}
+
+        backward pass {
+        - calculate error for the output layer 
+        - for each layer, moving backwards from output layer,  
+            - propogate the error back one layer 
+            - update weights w/ gradient decsent 
+        }
+
+Deep neural network - neural net with many hidden layers 
+- A part of deep learning algos: deep learning = using many layers to model complex things
+
+Overfitting can happen very easily with neural nets, especially if it becomes reliant on specific nodes
+- Dropout = while training, temporarily removing certain neurons, selected randomly, to prevent the network from being over-reliant on them
+
+https://playground.tensorflow.org/ <- cool way to visualize neural nets
+
+Hyperparameters = preset values that control how a machine learning model learns (e.g. number of neurons, dropout rate, activation functions, etc)
+
+
+Computer Vision = computational methods for analyzing and understanding images
+
+Image Convolution = sliding a kernel over an image to get a new image
+- used for feature extraction
+- it is common to normalize pixel values (0-255) between 0 and 1
+
+Pooling = reducing the size of an input by sampling from regions of the input; it "summarizes" small regions (e.g. 2x2 blocks)
+    - e.g. we dont rlly care if the pixel is at (200, 400) or at (201, 400), and pooling reduces the input size while preserving this
+    
+    Max-pooling = pooling by choosing the max value in each region (very common)
+    Average-pooling = pooling by takint the average of the values in each region 
+
+Convolutional Neural Network = neural net that uses convolution (usually for image analysis)
+    - note that the values in the kernels can also be trained
+    - after conv layers and pooling layers, it is flattened and fed into fully connected layers
+    - it is common to havea {conv-pool-...-conv-pool-flatten-fc-fc-fc-output} structure, 
+        with many iterations of conv layers and pooling layers, each time getting to higher and higher level features 
+        e.g. edges/curves/shapes -> eyes/objects etc.
+        ^ we don't actually know what it is, since it is learning for itsself
+    
+Feed Forward Neural Networks = input data is provided to the network, which eventually produces some output (only goes one way)
+    [Input] -> [Network] -> [Output]
+
+Recurrent Neural Network = the network uses its own output as input.
+                    v----|
+    [Input] -> [Network] -> [Output]
+
+    - can give many outputs (each time, it gives an output and also goes back into the network) [one-to-many]
+    - also can take in many inputs (each time it recurrs, take in a new frame (along with info from prevoius network run)) [many-to-one]

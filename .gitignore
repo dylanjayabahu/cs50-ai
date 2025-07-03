@@ -1,0 +1,80 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VSCode settings (optional)
+.vscode/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Ignore all data folders that may contain large files
+/data/
+/large/
+/small/
+/gtrsb/
+
+# Generated model/analysis outputs
+/diagrams/
+/corpus0/
+/corpus1/
+/corpus2/
+
+# Sentence and NLP data (if not small/sample)
+# (remove this line if you want those small .txt files tracked)
+/sentences/
+
+# Pygame assets - keep small assets, ignore bulky ones
+assets/*.ttf
+assets/*.mp3
+assets/*.wav
+assets/*.mp4
+assets/*.avi
+assets/*.mov
+assets/*.zip
+assets/*.tar
+assets/*.gz
+assets/*.7z
+
+# CSVs - ignore large ones but allow small samples
+*.csv
+!sample_*.csv  # explicitly allow sample CSVs if you name them like this
+
+# Model weights or saved ML models
+*.h5
+*.hdf5
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.onnx
+
+# Cache from transformers, torch, etc.
+~/.cache/
+.cache/
+huggingface/
+
+# Notebook output images or temp files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.pdf
+*.ppm

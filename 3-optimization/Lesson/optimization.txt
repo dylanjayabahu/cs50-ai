@@ -1,0 +1,195 @@
+Full CS50 notes: https://cs50.harvard.edu/ai/notes/3/
+
+Optimization = choosing the best option from a set of possible options
+
+
+
+
+
+Local Search = search algo that maintains a single node and searches by moving to a neighboring node
+    - instead of finding a path, we find the best answer to a questions
+    - e.g. where to best place a hospital in a city
+    - finds local maximima/minima (local extrema, just like calculus) by taking local steps => hence the name local search
+
+Hill Climbing = start at a state, move to wichever neighbour is highest. Keep going until no neighbours are higher
+    - guarantees a local max/min, only sometimes finds the global max/min
+        -> note that this can be a flat local max/min or a shoulder (flat area)
+        -> basically the same as f'(x) = 0 in a calculus sense
+    - same works in the opposite way for a global min
+
+    Hill Clibing Variants:
+        - steepest-ascent = choose the highest valued neighbour (described above)
+        - stochastic = choose randomly amongst any higher valued neighbour 
+        - first-choice = choose the first higer valued neighbour it finds
+        - random-restart = conduct hill climbing many times with new initial states
+        - local-beam search = choose not just 1 higher-valued neighbour but k of them 
+            (unlike most local searches since it looks at many nodes)
+    ^ all of these never go to a worst position, even temporarily
+
+
+    Simulated Annealing
+    - Annealing = high temp system and eventuall settles and cools down
+
+    - Early on we have a higher temperature; more likely to accept neighbours that are worst
+    - Later on, lower temperature; less likely to accept worst neighbours
+
+    - likeliness of moving to worst neighbouring state is based on the temperature and the differnece in energy
+        - energy difference is how much worst the neighbour node is than us 
+        - common to use e^(E/T); e = eulers number, E = energy, T = temperature
+
+side note - NP complete problems are problems where there is no known efficient way to solve the problem (loose definition)
+
+
+
+
+
+
+Linear Programming:
+minimize some cost function, (typically with real, non-discrete values)
+    - e.g. px1 + qx2 + rx3 + ...
+    - where x1, x2, x3 are some variables and p,q,r... are ceofficients
+    ^ (some linear equation)
+
+    - with linear constraints: 
+        ax1 + bx2 + cx3 + ... <= b 
+        or 
+        ax1 + bx2 + cx3 + ... = b 
+
+        note that typically we deal with <= or = constraints (not >=) - this is solvable my multiplying eqn by -1
+
+    - with bounds for each variable:
+        l_i < x_i < u_i 
+        l_i/u_iis the ith lower/upper bound respectively
+
+if we can represent the problem as described above, we can efficiently solve it with existing Algos (e.g. with scipy)
+
+Linear Programming Problem Algos:
+- Simplex 
+- Interior-point
+
+
+
+
+
+
+Constraint Satisfaction Problems - some number of variables that we need to assign values to, but subject to constraints
+- Constraint Graph - nodes are the variables, edges are the constraints b/w variables
+- More formally, a constraint satisfcation problem contains:
+    - Set of variables {X1, X2, X3...}
+    - Set of domains for the variables {D1, D2, D3 ...}
+    - Set of constraints C
+- e.g. sudoku
+    - Variables are all the empty squares 
+    - Domains is [1, 9] for each variable 
+    - Constraints:
+        (0, 0) != (0, 1) != (0, 2) != (0, 3) ...
+        ^ mathematatically enforcing the rules (diff num in each row/col/square)
+
+More on Contraints:
+- Hard vs Soft 
+     -> Hard Constraints = must be satisfied 
+     -> Soft Constraints = preferred to be satisfied
+
+- Unary Constraints: involving only 1 variable 
+     -> e.g. A != Monday, B > 10, etc.
+    
+- Binary Constraints: involves 2 variables
+     -> e.g. A != B, C < D, etc. 
+
+    
+Node Consistency = when all the variable's domains satisfy the unary constraints 
+     -> e.g. if a constraint is that A != 9, we want to make sure A's domain doesn't include 9
+        ^ this makes that variable node consistent
+    - if all the variables are node consistent, the entire problem is node consistent
+
+Arc Consistency = when all the variable's domains satisfy the binary constraints
+     - e.g. If there is a value in X that leaves no values for Y, we need to remove it so that X can be arc-consistent with respect to Y
+      ^ note this only covers X being arc consistent with respect to Y, but not Y being arc consistent with respect to X, 
+        and also doesnt cover arc consistenty between any other variables either, obviously
+
+    - to achieve arc consistency for the whole Constraint Satisfaction Probelm (csp), we can use AC-3
+
+
+    AC-3: algorithm to enforce arc-consistency across an entire csp
+     -> maintains a queue of all the arcs it needs to make consistent
+        - removes (dequeue) from the queue when it makes the arc consistent
+        - adds to the queue if needed 
+            - if u reduce the domain of X while making it arconsistent with Y, 
+              u might have made W that used to be arcconsistent with X no longer arcconsistent
+            - so u add it back to the end of the queue; that is, we add back the arc between X and all its neighbours (such as W)
+              back to the end of the queue (except for the arc b/w X and Y, which we are on rn)
+            - if at any point X's domain has length of 0, the csp is not solvable
+        - repeats until queue is empty
+    
+    Note that AC-3 doesnt always solve the problem - just enforces arc-consistency
+
+We can use search to find a solution to a csp problem; u can formulate a csp as a search problem
+- intial state = empty assignment
+    -> assignment is a set of variables we have assigned values to, and the values we assigned 
+- actions: add {var = value} to the assignment 
+- transition model: how adding an assignment changes the assignment 
+- goal test: see if all variables are in teh assignment 
+- path cost - doesnt matter, we just need a sol
+
+^ however, this is quite inefficient, if we used, say, BFS 
+
+Backtracking Search:
+- we try assigning values to variables that don't yet have a value
+- if we ever get stuck (no moves from here), backtrack and assign a diff value
+- like what u need to do to solve a hard sudoku
+
+function Backtrack(assignment, csp):
+    if assignment complete: return assignment
+
+    var = Select-Unassigned-Var(assignment, csp)
+    for value in Domain-Values(var, assignment, csp):
+        if value consistent with assignment:
+            add {var = value} to assignment
+            result = Backtrack(assignment, csp)
+            if result ≠ failure:
+                return result
+            remove {var = value} from assignment
+    return failure
+
+We can make this process even more efficient with Inference 
+ -> by enforcing arc-consistency before the inference step 
+
+This is called the maintaining arc-consistency algorithm; enforce 
+ - arc-consistency every time we make a new assignment
+ - that is, call AC-3 after each new assignment, 
+    with an initial queue of all arcs (Y, X) where Y is a neighbour of X and X is the assignment we just made
+function Backtrack(assignment, csp):
+    if assignment complete:
+        return assignment
+    
+    var = Select-Unassigned-Var(assignment, csp)
+    for value in Domain-Values(var, assignment, csp):
+        if value consistent with assignment:
+
+            add {var = value} to assignment
+
+            inferences = Inference(assignment, csp)
+            if inferences ≠ failure:
+                add inferences to assignment
+
+                result = Backtrack(assignment, csp)
+                if result ≠ failure:
+                    return result
+
+            remove {var = value} and inferences from assignment
+
+    return failure
+
+
+We can make our search even more efficient still by using heuristics 
+
+Heuristics for Selecting Unassigned Variables:
+- MRV = minimum remaining values = select the variable with the smallest domain 
+- Degree Heuristic = select the variable with the highest degree
+    (degree = number of nodes attached to this nodes
+            = number of variables constrained to this one)
+
+Heuristic for Selecting which Value of Domain to check:
+- Least Constraining Values Heuristic 
+    = return variables in order based on the # choices for neighbouring variables ruled out if we picked it
+    that is, try variables that constraint the least first. A variable that rules out a lot is likely to cause a dead end

@@ -1,0 +1,13 @@
+Unsupervised Learning:
+When we have data without labels; AI must learn patterns
+
+Clustering: organizing objects into clusters 
+    - e.g. grouping pixels of an image; grouping consumers in marketing research 
+
+K-means clustering:
+    - divide the data points into k clusters 
+    - repeatedly assign points to clusters and updating the centers' clusters
+        - a cluster is defined based on its center 
+        - a point belongs to the cluster whose center is closest to it
+        - when we update a cluster, we move its center to the average of all the points in that cluster 
+        - repeat until the cluster centers converge 

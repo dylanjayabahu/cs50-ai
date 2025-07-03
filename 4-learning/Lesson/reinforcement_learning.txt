@@ -1,0 +1,59 @@
+Reinforcement Learning:
+- after each action, the agent gets feedback in the form of reward or punishment (a positive or a negative numerical value)
+- neither supervised nor unsupervised
+- the goal is to maximize the reward/minimize punishment
+
+
+
+Markov Decision Process = decision making model 
+(instead of, with a markov chain, where there is only one next state that we go to with some probability, 
+now there are several next states, each arising from a different action our agent can take)
+- Set of states, S
+- Set of actions, Actions(S)
+- Transition model, P(s’ | s, a) -> s' is the next state; what is the probability that we get to the next state given the current state and the action we took
+- Reward function R(s, a, s’)
+
+
+
+Q-learning - one of many reinforcement learning models 
+    = learning a function Q(s,a) that estimates the value of performing action a in state s
+- Start with Q(s, a) = 0 for all s,a
+- When we take an action and get a reward
+    - Get an estimate of taking the action based on:
+        1. current reward
+        2. expected future rewards
+    - Update Q(s, a) based on previous Q(s, a) and our new estimate
+        More formally:
+        -> Q(s, a) <- Q(s, a) + alpha(new_estimate - old_estimate)
+            - alpha is learning rate again
+            - new_estimate = r + future_reward_estimate
+                future_reward_estimate = max across all possible next actions, a', we can take of Q(s', a')
+            - old_estimate = Q(s, a)
+
+
+            - basically nudging Q(s,a) closer to the new estimate
+
+        Put it together with our substitutions for new_estimate and old_estimate
+                                      {      new_estimate      }    {old estimate}
+        Q(s, a) <- Q(s, a) + alpha[   (r + gamma*Max(Q(s', a')))  -    Q(s, a)    ]
+            - r = reward at this step [considering current reward (1)]
+            - Max(Q(s', a')) = the best possible reward of all our next actions [considering expected future rewards (2)]
+                - gamma = how much to weight future rewards
+            - alpha = learning rate
+
+- Greedy Decision-Making algorithm:
+    - always choose the action a in current state s that has the highest Q(s, a).
+    - if we follow this, we don't leave any room for exploration
+    
+- Exploration vs Exploitation (using knowledge we already have)     
+    - For an algo that only ever exploits: it may not maximize its rewards b/c it doesn't know about other possibilities.
+
+- Epsilon-Greedy Algorithm:
+    - epsilon is how often we want to move randomly (exploration)
+    - with probability 1-epsilon, choose the best action (as in greedy decision making)
+    - but with probability epsilon, choose a random action
+
+- Just like with minimax, this works well when there are a small possible number of states 
+    - more states makes this computationaly infeasible (e.g. chess again)
+    - so instead, we can approximate Q(s,a) using various other features (instead of storing a single value for each s,a as we do rn)
+    - ^ basically like the Q-learning version of depth-limited minimax

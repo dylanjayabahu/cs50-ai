@@ -1,0 +1,36 @@
+Conditional Probability:
+
+P(a|b) = P(a n b) / P(b)
+       = alpha * P (a n b)
+    -> conditional probability is proportional to joint probability
+    -> alpha = 1/P(b)
+
+rearranged> 
+P(a n b) = P(b) P(a|b) (1)
+
+swap a and b> 
+P(b n a) = P(a) P(b|a) = P(a n b) (2)
+
+P(a n b) = P(a) P(b) if and only if a/b are independent
+
+
+set (1) = (2)
+
+P(a) P(b|a) = P(b) P(a|b)
+
+P(b|a) = P(b) P(a|b) / P(a)
+^ Bayes Rule
+
+
+Negation: P(not a) = 1-P(a)
+Inclusion Explusion: P(a u b) = P(a) + P(b) - P(a n b)
+
+Marginalization:
+P(a) = P(a, b) + P(a, not b)
+more generally, if b (and a) are not binary:
+P(A=a) = SUM_j (P(A=a, B=b_j))
+
+Conditioning:
+P(a) = P(a | b)P(b) + P(a | ¬b)P(¬b).
+again, if b (and a) are not binary:
+P(A=a) = SUM_j [P(A=a|B=b_j) * P(B=b_j)]

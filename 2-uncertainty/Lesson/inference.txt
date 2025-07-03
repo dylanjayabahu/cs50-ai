@@ -1,0 +1,119 @@
+Inference
+
+Just like w/ knowledge, we can infer new info based on probabilities => we can infer a new probability of distribution for some value
+
+Inference has multiple properties.
+- Query X: the variable for which we want to compute the probability distribution (our question)
+- Evidence variables, E => variables we have been observed from event e
+- Hidden variables, Y - variables that arent directly observed (not in E), but still have an impact on the query (like in-between variables)
+- Goal is to find P(X | e), where E is the variables from the event e => e = E_1 n E_2 n E_3 ...
+^ can be done w/ probability rules
+
+Example:
+Lets say we wanted P(a | b, c)
+
+Since conditional probability is proportional to joint probability, we can say
+
+P(a | b, c)
+= alpha * P(a, b, c)
+
+If there is a hidden variable, d that we don't know, we can use Marginalization
+
+= alpha * [  P(a,b,c|d)P(d)  +   P(a,b,c|not D)P(not D) ] 
+      ^  or more generally, sum in this way for everything in D's domain if it's not a binary random variable
+
+Now we have the answer, since we can calculate the above given the info in the bayesian network
+ - we can find the result of the alpha term by normalizing the resulting probability distribution 
+
+
+INFERENCE BY ENUMERATION 
+
+P(X | e)
+
+ = alpha * P(X, e) {{conditional -> joint rule}}
+
+ = alpha * [ P(X, e, y_1)P(y_1) +  P(x, e, y_2)P(y_2) + ...] {{Marginalization rule}}
+
+ = alpha * SUM_y[ P(X, e, y) ] {{expressed in summation notation}}
+
+ ^ alpha = normalizing factor 
+   X = query 
+   e = observed variables (evidence)
+   y = hidden variables
+
+We could implement this math ourselves in code to work on any bayesian network
+but a lot of libraries exist for us such that we just need to describe the network and our query
+
+Note that this algorithm is not particularly efficient, since in the Marginalization step
+we iterate over all possible values of all the hidden variables
+ - you could optimize be storing probabilites that you recalculate, but even then it is still inefficient, 
+   unreasonably so as the # of hidden variables and the size of their domains increase. 
+
+Instead, it is sometimes good enough to just approximate the Inference
+
+
+SAMPLING 
+ - like running experimental simulations
+ - you take a sample from all the nodes based on the probability distribution for that node
+        - for nodes with dependance on parents, u sample only from the probability distribution with the value u selected for that parent 
+          (e.g. if b is [0.1, 0.9] when a = 0 and [0.4, 0.6] when a = 1, and we sampled a=1, we will sample b based on [0.4, 0.6])
+
+ - we can run this "simulation" sampling several times,  
+    -> we can calculate the experimental probability for each variable, rejecting any samples that don't match the evidence
+            -> Hence the name: Rejection Sampling 
+            -> Note that if ur evidence is rlly unlikely, ur gonna reject a lot of samples
+    -> the inference becomes more accurate as u do more sampling
+
+
+
+LIKELIHOOD WEIGHTING 
+- Start by fixing the values for evidence variables.
+- Sample the non-evidence variables using conditional probabilities in the Bayesian network.
+- Weight each sample by its likelihood: the probability of all the evidence occurring.
+
+^ kinda like a mix of enumeration inference and sampling; 
+- this time instead of rejecting samples that don't match our evidence, we only consider samples where the evidence is true and weight them accordingly
+
+
+
+MARKOV MODELS
+So far everything has been static; the vars don't change over time 
+We can use Markov Models to do this 
+
+X_t is the value of X at time t (e.g. day t); X_{t+1} is the value at the next time step 
+
+Markov Assumption: the current state depends on only a finite fixed number of previous states
+    - e.g. if we want to predict the weather tomorrow, we theoertically should use all historical weather data, 
+            but we assume that it is dependant a finite number of previous states; only on the last 3 days of weather, for example
+    - for the Standard Markov Assumption (first-order/order-1), we restrict this finite number to be 1
+            - e.g. it only depends on yesterday's weather
+
+Markov Chain (first order): sequence of random variables where the distribution of each variable follows the Standard Markov assumption
+ ^ Each event in the chain occurs based on the probability of the event before it 
+
+Transition model: specify the the probability distributions of the next event based on the possible values of the current event
+ - (e.g. as a matrix with today on one axis and tomorrow on the other axis)
+
+Hidden Markov Models = model for a system with hidden states that generate some observed event 
+    - we have a measurement of the world and need to infer the state of the world form it 
+    - e.g. we observe that there ppl have umbrellas (observed event) so we need to infer that it is raining (hidden state)
+    - or the robot has some sensor distance data (observed event) and needs to infer its position (hidden state)
+    - or audio waveforms (observed) vs actual words (hidden state)
+
+Sensor Markov Assumption - the evidence/observed variable depends only on the corresponding hidden state 
+   - with this assumption, we can have another probability matrix mapping the observations to the states 
+     ^ this is called the Sensor Model, aka Emission Model/Probabilities
+
+Tasks using Hidden Markov Models:
+- Filtering: 
+    = given observations from start until now, calculate the probability distribution for the current state.  
+    -> E.g given information on when people bring umbrellas form the start of time until today,
+       we generate a probability distribution for whether it is raining today or not.
+- Prediction: 
+    = given observations from start until now, calculate the probability distribution for a future state.
+- Smoothing: 
+    = given observations from start until now, calculate the probability distribution for a past state.
+    -> e.g. calculating the probability of rain yesterday given that people brought umbrellas today.
+- Most likely explanation: 
+    = given observations from start until now, calculate most likely sequence of events.
+    -> e.g. given the audio waveforms, what were the words spoken

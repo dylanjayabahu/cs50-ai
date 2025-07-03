@@ -27,14 +27,12 @@ Thumbs.db
 **/gtsrb/
 
 # Generated model/analysis outputs
-**//diagrams/
-**//corpus0/
-**//corpus1/
-**//corpus2/
+**diagrams/
+**/corpus*/
 
 # Sentence and NLP data (if not small/sample)
 # (remove this line if you want those small .txt files tracked)
-**//sentences/
+**/sentences/
 
 # Pygame assets - keep small assets, ignore bulky ones
 **/assets/*.ttf
@@ -74,4 +72,4 @@ huggingface/
 *.svg
 *.webp
 *.pdf
-*.ppm
+**/*.ppm

@@ -1,5 +1,4 @@
-# Comprehensive CS50 Notes
-**Source**: https://cs50.harvard.edu/ai/2024/notes/1/
+**CS50 notes**: https://cs50.harvard.edu/ai/2024/notes/1/
 
 ---
 

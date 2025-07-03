@@ -65,11 +65,4 @@ Thumbs.db
 huggingface/
 
 # Notebook output images or temp files
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.svg
-*.webp
-*.pdf
 **/*.ppm

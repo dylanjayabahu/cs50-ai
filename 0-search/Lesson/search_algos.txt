@@ -6,7 +6,7 @@ If frontier is a queue, u get BFS
 
 If u select from frontier based on lowest h(n) (heuristic) alone, u get Greedy Best First Search (GBFS)
 
-If u select from frontier based on lowest g(n) (cost to reach node) alone, u get Dijkstra's Algo (hehe Mr. Schattman)
+If u select from frontier based on lowest g(n) (cost to reach node) alone, u get Dijkstra's Algo
     - note that dijkstra's always solves optimally, because it doesn't stop when u reach the goal, but rather when the frontier is empty
 
 Instead, if u select from frontier based on lowest g(n) + h(n) [g(n) is cost to get to the node], u get A*
